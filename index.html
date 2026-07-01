@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Gestión de Productos - Electrica</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="icon" type="image/png" href="./assets/icono.ico">
+</head>
+<body>
+
+    <div class="container">
+        <aside class="sidebar">
+            <div class="brand">
+                <img src="./assets/logo.png" alt="Logo" style="width: 48px; height: 48px; object-fit: contain;">
+            </div>
+            <nav class="menu">
+                <a href="#" class="active" onclick="showSection('main-content')"><span class="material-symbols-outlined">dashboard</span> Panel Principal</a>
+                <a href="#" onclick="showSection('stats-section')"><span class="material-symbols-outlined">bar_chart</span> Estadísticas</a>
+                <a href="#" onclick="showSection('reportes-section')"><span class="material-symbols-outlined">analytics</span> Reportes</a>
+                <a href="#" onclick="showSection('config-section')"><span class="material-symbols-outlined">settings</span> Configuración</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+    <div id="main-content">
+        <header class="top-bar">
+            <input type="text" id="search-input" placeholder="Buscar producto...">
+            <button class="btn btn-primary" id="btn-add-product">Agregar Producto</button>
+            <div id="edit-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="document.getElementById('edit-modal').style.display='none'">&times;</span>
+        <h2>Modificar Producto</h2>
+        <form id="edit-form">
+            <input type="hidden" id="edit-id">
+            <div class="form-group"><input type="text" id="edit-name" placeholder="Nombre" required></div>
+            <div class="form-group"><input type="number" id="edit-price" placeholder="Precio" step="0.01" required></div>
+            <div class="form-group"><input type="number" id="edit-stock" placeholder="Stock" required></div>
+            <button type="submit" class="btn btn-primary" style="width:100%">Guardar Cambios</button>
+        </form>
+    </div>
+</div>
+        </header>
+
+        <div class="stats-container">
+            <div class="stat-card"><h3>Total Productos</h3><p id="stat-total">0</p></div>
+            <div class="stat-card"><h3>Stock Bajo (menor a 5)</h3><p id="stat-low">0</p><button class="btn-filter" id="btn-toggle-filter" onclick="toggleFiltro()">mostrar</button></div>
+            <div class="stat-card"><h3>Valor Total</h3><p id="stat-value">$0.00</p></div>
+        </div>
+
+        <div class="products-grid" id="products-container"></div>
+    </div>
+
+    <section id="reportes-section" style="display: none;">
+        <h2 style="margin-bottom: 1.5rem;">Historial de Actividades</h2>
+        <div id="lista-actividades" class="stat-card"></div>
+    </section>
+
+    <section id="config-section" style="display:none;">
+        <h2>Configuración</h2>
+        <div class="config-card">
+            <h3>Mantenimiento</h3>
+            <button class="btn btn-danger" onclick="limpiarHistorial()">Limpiar historial</button>
+        </div>
+        
+        <div class="config-card" style="margin-top: 1rem;">
+            <h3>Ofertas Masivas</h3>
+            <div class="config-input-group">
+                <input type="text" id="offer-cat" class="config-input" placeholder="Categoría">
+                <input type="number" id="offer-perc" class="config-input" placeholder="%">
+                <button class="btn btn-primary" onclick="ejecutarOferta()">Aplicar</button>
+            </div>
+        </div>
+
+        <div class="config-card" style="margin-top: 1rem;">
+            <h3>Exportar</h3>
+            <button class="btn btn-secondary" onclick="exportarPDF()">Descargar Inventario PDF</button>
+        </div>
+    </section>
+
+<section id="stats-section" style="display:none;">
+    <h2>Estadísticas y Movimientos</h2>
+
+    <div class="config-card">
+        <h3>Registrar Movimiento</h3>
+        <div class="config-input-group">
+            <input type="text" id="move-search" class="config-input" placeholder="Nombre o Código...">
+            <button class="btn btn-primary" onclick="registrarMovimiento('venta')">Registrar Venta</button>
+            <button class="btn btn-secondary" onclick="registrarMovimiento('compra')">Registrar Compra</button>
+        </div>
+    </div>
+
+    <div class="config-card" style="margin-top: 20px;">
+    <h3>Estadísticas Avanzadas</h3>
+    <div class="config-input-group">
+        <input type="text" id="chart-filter" class="config-input" placeholder="Código del producto...">
+        
+        <select id="escala-tiempo" class="config-input">
+            <option value="semana">Semanal</option>
+            <option value="mes" selected>Mensual</option>
+            <option value="anio">Anual</option>
+        </select>
+        
+        <button class="btn btn-primary" onclick="actualizarGrafico()">Generar Histograma</button>
+    </div>
+    <div style="height: 300px;"><canvas id="ventasChart"></canvas></div>
+</div>
+</section>
+<div id="add-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" id="close-add-modal">&times;</span>
+        <h2>Nuevo Producto</h2>
+        <form id="product-form">
+            <div class="form-group"><input type="text" id="prod-name" placeholder="Nombre" required></div>
+            <div class="form-group"><input type="text" id="prod-code" placeholder="Código" required></div>
+            <div class="form-group"><input type="text" id="prod-category" placeholder="Categoría" required></div>
+            <div class="form-row">
+                <input type="number" id="prod-price" placeholder="Precio" step="0.01" required>
+                <input type="number" id="prod-stock" placeholder="Stock" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%; margin-top:1rem;">Guardar Producto</button>
+        </form>
+    </div>
+</div>
+</main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <script type="module" src="script.js"></script>
+    
+    <script>
+    function showSection(sectionId) {
+        // 1. Ocultamos TODAS las secciones
+        document.getElementById('main-content').style.display = 'none';
+        document.getElementById('reportes-section').style.display = 'none';
+        document.getElementById('config-section').style.display = 'none';
+        document.getElementById('stats-section').style.display = 'none'; // ¡IMPORTANTE!
+
+        // 2. Mostramos SOLO la que queremos
+        const target = document.getElementById(sectionId);
+        if (target) {
+            target.style.display = 'block';
+        }
+
+        // 3. Clase activa en el menú
+        document.querySelectorAll('.menu a').forEach(a => a.classList.remove('active'));
+        // Si el evento existe, añadimos la clase activa
+        if (event) event.currentTarget.classList.add('active');
+    }
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+</body>
+</html>
