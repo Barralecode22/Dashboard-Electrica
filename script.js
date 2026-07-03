@@ -44,26 +44,46 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // 3. Formulario Agregar Producto
-    document.getElementById('product-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const prod = {
-            nombre: document.getElementById('prod-name').value,
-            codigo: document.getElementById('prod-code').value,
-            categoria: document.getElementById('prod-category').value,
-            precio: parseFloat(document.getElementById('prod-price').value),
-            stock: parseInt(document.getElementById('prod-stock').value)
-        };
-        await addDoc(collection(db, "productos"), prod);
-        await registrarActividad("Nuevo Producto", `Se añadió: ${prod.nombre}`);
-        document.getElementById('add-modal').style.display = 'none';
-        e.target.reset();
-    });
+document.getElementById('product-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const prod = {
+        nombre: document.getElementById('prod-name').value,
+        codigo: document.getElementById('prod-code').value,
+        categoria: document.getElementById('prod-category').value,
+        precio: parseFloat(document.getElementById('prod-price').value),
+        stock: parseInt(document.getElementById('prod-stock').value)
+    };
+
+    // ... dentro del evento 'submit' de 'product-form' ...
+
+// 1. Guardar el producto
+const docRef = await addDoc(collection(db, "productos"), prod);
+
+// 2. Registrar actividad
+await registrarActividad("Nuevo Producto", `Se añadió: ${prod.nombre}`);
+
+// 3. Registrar el movimiento con la CANTIDAD inicial
+await addDoc(collection(db, "movimientos"), {
+    productoId: docRef.id,
+    tipo: 'compra',
+    cantidad: prod.stock, // <--- AGREGA ESTO
+    fecha: serverTimestamp()
+});
+
+    // 4. Limpiar formulario y cerrar modal
+    document.getElementById('add-modal').style.display = 'none';
+    e.target.reset();
+    alert("Producto registrado correctamente.");
+});
 
     // 4. Buscador
     document.getElementById('search-input').addEventListener('input', (e) => {
         const val = e.target.value.toLowerCase();
         renderProducts(productos.filter(p => p.nombre.toLowerCase().includes(val)));
     });
+
+    // Ejecutar gráfico general al cargar
+    renderizarGraficoGeneral();
 });
 
 // --- FUNCIONES DE GESTIÓN DE STOCK Y PRODUCTOS ---
@@ -74,6 +94,7 @@ window.updateStock = async (fireId, change) => {
     const nuevoStock = Math.max(0, prod.stock + change);
     await updateDoc(doc(db, "productos", fireId), { stock: nuevoStock });
     await registrarActividad("Stock", `${prod.nombre}: ${prod.stock} → ${nuevoStock}`);
+    renderizarGraficoGeneral(); // Actualizar resumen
 };
 
 window.deleteProduct = async (fireId, nombre) => {
@@ -155,86 +176,169 @@ window.renderProducts = (lista) => {
         const badgeDescuento = descuento > 0 ? `<span class="badge-discount">-${descuento}% OFF</span>` : '';
         const card = document.createElement('div');
         card.className = 'product-card';
-        // ... dentro de renderProducts ...
-card.innerHTML = `
-    ${badgeDescuento}
-    <small style="color:var(--text-muted)">${prod.codigo}</small>
-    <h3>${prod.nombre}</h3>
-    <span class="product-category">${prod.categoria}</span>
-    <div class="product-price">$${prod.precio.toFixed(2)}</div>
-    <div class="stock-management">
-        <div class="stock-controls">
-            <button class="btn-stock" onclick="updateStock('${prod.fireId}', -1)">-</button>
-            <span class="stock-value">${prod.stock}</span>
-            <button class="btn-stock" onclick="updateStock('${prod.fireId}', 1)">+</button>
-        </div>
-    </div>
-    <div style="display: flex; gap: 8px; margin-top: 12px;">
-        <button class="btn-action btn-delete" onclick="deleteProduct('${prod.fireId}', '${prod.nombre}')">Eliminar</button>
-        <button class="btn-action btn-edit" onclick="abrirModalModificar('${prod.fireId}')">Modificar</button>
-    </div>
-`;
-// ...
+        card.innerHTML = `
+            ${badgeDescuento}
+            <small style="color:var(--text-muted)">${prod.codigo}</small>
+            <h3>${prod.nombre}</h3>
+            <span class="product-category">${prod.categoria}</span>
+            <div class="product-price">$${prod.precio.toFixed(2)}</div>
+            <div class="stock-management">
+                <div class="stock-controls">
+                    <button class="btn-stock" onclick="updateStock('${prod.fireId}', -1)">-</button>
+                    <span class="stock-value">${prod.stock}</span>
+                    <button class="btn-stock" onclick="updateStock('${prod.fireId}', 1)">+</button>
+                </div>
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 12px;">
+                <button class="btn-action btn-delete" onclick="deleteProduct('${prod.fireId}', '${prod.nombre}')">Eliminar</button>
+                <button class="btn-action btn-edit" onclick="abrirModalModificar('${prod.fireId}')">Modificar</button>
+            </div>
+        `;
         productsContainer.appendChild(card);
     });
 };
 
-// Función para abrir modal y cargar datos
+// --- CORRECCIÓN PARA EL GRÁFICO DE BARRAS ---
+window.actualizarGrafico = async () => {
+    const input = document.getElementById('chart-filter').value.trim();
+    if (!input) return alert("Ingresa el nombre o código del producto");
+    const prod = productos.find(p => p.codigo === input || p.nombre.toLowerCase() === input.toLowerCase());
+    if (!prod) return alert("Producto no encontrado.");
+
+    const q = query(collection(db, "movimientos"), where("productoId", "==", prod.fireId));
+    const snapshot = await getDocs(q);
+    const vH = new Array(24).fill(0);
+    const cH = new Array(24).fill(0);
+
+    snapshot.docs.forEach(doc => {
+    const data = doc.data();
+    if (data.fecha && typeof data.fecha.toDate === 'function') {
+        const h = data.fecha.toDate().getHours();
+        // Sumamos la cantidad o 1 si es un registro antiguo sin cantidad
+        const cant = data.cantidad || 1; 
+        if (data.tipo === 'venta') vH[h] += cant;
+        else if (data.tipo === 'compra') cH[h] += cant;
+    }
+});
+
+    const ctx = document.getElementById('ventasChart').getContext('2d');
+    
+    // VERIFICACIÓN SEGURA: solo destruye si existe y tiene el método destroy
+    if (window.ventasChart && typeof window.ventasChart.destroy === 'function') {
+        window.ventasChart.destroy();
+    }
+    
+    window.ventasChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: Array.from({length: 24}, (_, i) => `${i}:00`),
+            datasets: [
+                { label: 'Ventas', data: vH, backgroundColor: '#ef4444' },
+                { label: 'Compras', data: cH, backgroundColor: '#2563eb' }
+            ]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+};
+
+window.renderizarGraficoGeneral = async (filtro = 'mes') => { // Por defecto 'mes'
+    const canvas = document.getElementById('generalChart');
+    if (!canvas) return;
+
+    // Actualizamos el título visualmente
+    const titulos = { 'dia': 'Hoy', 'semana': 'Esta Semana', 'mes': 'Este Mes', 'anio': 'Este Año' };
+    document.getElementById('titulo-periodo').textContent = `Mostrando: ${titulos[filtro]}`;
+
+    const snapshot = await getDocs(collection(db, "movimientos"));
+    let v = 0, c = 0;
+    const ahora = new Date();
+
+    snapshot.docs.forEach(d => {
+        const data = d.data();
+        if (!data.fecha) return;
+
+        const fechaMov = data.fecha.toDate();
+        let esValido = false;
+
+        // Lógica de filtrado
+        if (filtro === 'dia') {
+            esValido = fechaMov.toDateString() === ahora.toDateString();
+        } else if (filtro === 'semana') {
+            const haceUnaSemana = new Date();
+            haceUnaSemana.setDate(ahora.getDate() - 7);
+            esValido = fechaMov >= haceUnaSemana;
+        } else if (filtro === 'mes') {
+            esValido = fechaMov.getMonth() === ahora.getMonth() && fechaMov.getFullYear() === ahora.getFullYear();
+        } else if (filtro === 'anio') {
+            esValido = fechaMov.getFullYear() === ahora.getFullYear();
+        }
+
+        if (esValido) {
+            const cant = data.cantidad || 1;
+            data.tipo === 'venta' ? v += cant : c += cant;
+        }
+    });
+
+    const ctx = canvas.getContext('2d');
+    if (window.generalChart && typeof window.generalChart.destroy === 'function') {
+        window.generalChart.destroy();
+    }
+    
+    window.generalChart = new Chart(ctx, {
+        type: 'pie',
+        data: { 
+            labels: ['Ventas', 'Compras'], 
+            datasets: [{ data: [v, c], backgroundColor: ['#ef4444', '#2563eb'] }] 
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+};
+
 window.abrirModalModificar = (fireId) => {
     const prod = productos.find(p => p.fireId === fireId);
     if (!prod) return;
-
-    // Llenar inputs del modal (asumiendo que los IDs de inputs son edit-...)
     document.getElementById('edit-id').value = prod.fireId;
     document.getElementById('edit-name').value = prod.nombre;
     document.getElementById('edit-price').value = prod.precio;
     document.getElementById('edit-stock').value = prod.stock;
-
     document.getElementById('edit-modal').style.display = 'flex';
 };
 
-window.actualizarGrafico = async () => {
-    const code = document.getElementById('chart-filter').value;
-    if (!code) return alert("Ingresa un código de producto");
-
-    // 1. Obtener datos
-    const q = query(collection(db, "movimientos"), where("productoId", "==", code));
-    const snapshot = await getDocs(q);
+window.registrarMovimiento = async (tipo) => {
+    const input = document.getElementById('move-search').value.trim();
+    const cantidad = parseInt(document.getElementById('move-qty').value);
     
-    // 2. Inicializar arrays para 24 horas
-    const horas = Array.from({length: 24}, (_, i) => i); // [0, 1, ..., 23]
-    const ventasPorHora = new Array(24).fill(0);
-    const comprasPorHora = new Array(24).fill(0);
+    if (!input) return alert("Ingresa nombre o código");
+    if (isNaN(cantidad) || cantidad <= 0) return alert("Ingresa una cantidad válida");
 
-    // 3. Procesar datos
-    snapshot.docs.forEach(doc => {
-        const data = doc.data();
-        const fecha = data.fecha.toDate(); // Convertimos timestamp a fecha JS
-        const hora = fecha.getHours(); // Obtenemos la hora (0-23)
+    // BUSCAR EL PRODUCTO EXISTENTE
+    const prod = productos.find(p => p.nombre.toLowerCase() === input.toLowerCase() || p.codigo === input);
+    
+    // VALIDACIÓN: El botón solo funciona si el producto existe
+    if (!prod) {
+        return alert("Error: El producto no existe en el inventario. Debes crearlo primero.");
+    }
 
-        if (data.tipo === 'venta') ventasPorHora[hora]++;
-        if (data.tipo === 'compra') comprasPorHora[hora]++;
+    // REGISTRAR EN MOVIMIENTOS
+    await addDoc(collection(db, "movimientos"), {
+        productoId: prod.fireId,
+        tipo: tipo,
+        cantidad: cantidad, // Guardamos la cantidad
+        fecha: serverTimestamp()
     });
 
-    // 4. Renderizar (Destruir previo)
-    if (window.ventasChart) window.ventasChart.destroy();
+    // ACTUALIZAR STOCK EN LA COLECCIÓN PRODUCTOS
+    const cambio = (tipo === 'venta') ? -cantidad : cantidad;
+    await updateStock(prod.fireId, cambio);
+
+    alert(`${tipo.charAt(0).toUpperCase() + tipo.slice(1)} de ${cantidad} unidades registrada.`);
     
-    const ctx = document.getElementById('ventasChart').getContext('2d');
-    window.ventasChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: horas.map(h => `${h}:00`),
-            datasets: [
-                { label: 'Ventas', data: ventasPorHora, backgroundColor: '#ef4444' },
-                { label: 'Compras', data: comprasPorHora, backgroundColor: '#2563eb' }
-            ]
-        },
-        options: { 
-            responsive: true, 
-            maintainAspectRatio: false,
-            scales: { y: { beginAtZero: true, title: { display: true, text: 'Cantidad' } } }
-        }
-    });
+    // Limpiar campos
+    document.getElementById('move-search').value = '';
+    document.getElementById('move-qty').value = '1';
+    
+    // Actualizar gráficos
+    renderizarGraficoGeneral();
 };
 
 document.getElementById('edit-form').addEventListener('submit', async (e) => {
@@ -245,12 +349,10 @@ document.getElementById('edit-form').addEventListener('submit', async (e) => {
         precio: parseFloat(document.getElementById('edit-price').value),
         stock: parseInt(document.getElementById('edit-stock').value)
     };
-
     await updateDoc(doc(db, "productos", fireId), datosActualizados);
     await registrarActividad("Modificación", `Se editó: ${datosActualizados.nombre}`);
-    
     document.getElementById('edit-modal').style.display = 'none';
-    alert("Producto actualizado correctamente");
+    alert("Producto actualizado");
 });
 
 function updateStats() {
@@ -260,6 +362,5 @@ function updateStats() {
     document.getElementById('stat-value').textContent = `$${valorTotal.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
 }
 
-// Control Modales
 document.getElementById('btn-add-product').onclick = () => document.getElementById('add-modal').style.display = 'flex';
 document.getElementById('close-add-modal').onclick = () => document.getElementById('add-modal').style.display = 'none';

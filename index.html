@@ -51,7 +51,22 @@
 
         <div class="products-grid" id="products-container"></div>
     </div>
-
+    <div id="add-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" id="close-add-modal">&times;</span>
+        <h2>Nuevo Producto</h2>
+        <form id="product-form">
+            <div class="form-group"><input type="text" id="prod-name" placeholder="Nombre" required></div>
+            <div class="form-group"><input type="text" id="prod-code" placeholder="Código" required></div>
+            <div class="form-group"><input type="text" id="prod-category" placeholder="Categoría" required></div>
+            <div class="form-row">
+                <input type="number" id="prod-price" placeholder="Precio" step="0.01" required>
+                <input type="number" id="prod-stock" placeholder="Stock" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%; margin-top:1rem;">Guardar Producto</button>
+        </form>
+    </div>
+</div>
     <section id="reportes-section" style="display: none;">
         <h2 style="margin-bottom: 1.5rem;">Historial de Actividades</h2>
         <div id="lista-actividades" class="stat-card"></div>
@@ -83,46 +98,44 @@
     <h2>Estadísticas y Movimientos</h2>
 
     <div class="config-card">
-        <h3>Registrar Movimiento</h3>
+    <h3>Registrar Movimiento</h3>
+    <div class="config-input-group">
+        <input type="text" id="move-search" class="config-input" placeholder="Nombre o Código...">
+        <input type="number" id="move-qty" class="config-input" placeholder="Cant." style="max-width: 80px;" value="1">
+        
+        <button class="btn btn-primary" onclick="registrarMovimiento('venta')">Registrar Venta</button>
+        <button class="btn btn-secondary" onclick="registrarMovimiento('compra')">Registrar Compra</button>
+    </div>
+</div>
+
+    <div class="config-card" style="margin-top: 20px;">
+        <h3>Estadísticas Avanzadas</h3>
         <div class="config-input-group">
-            <input type="text" id="move-search" class="config-input" placeholder="Nombre o Código...">
-            <button class="btn btn-primary" onclick="registrarMovimiento('venta')">Registrar Venta</button>
-            <button class="btn btn-secondary" onclick="registrarMovimiento('compra')">Registrar Compra</button>
+            <input type="text" id="chart-filter" class="config-input" placeholder="Código del producto...">
+            <select id="escala-tiempo" class="config-input">
+                <option value="semana">Semanal</option>
+                <option value="mes" selected>Mensual</option>
+                <option value="anio">Anual</option>
+            </select>
+            <button class="btn btn-primary" onclick="actualizarGrafico()">Generar Histograma</button>
         </div>
+        <div style="height: 300px;"><canvas id="ventasChart"></canvas></div>
     </div>
 
     <div class="config-card" style="margin-top: 20px;">
-    <h3>Estadísticas Avanzadas</h3>
-    <div class="config-input-group">
-        <input type="text" id="chart-filter" class="config-input" placeholder="Código del producto...">
-        
-        <select id="escala-tiempo" class="config-input">
-            <option value="semana">Semanal</option>
-            <option value="mes" selected>Mensual</option>
-            <option value="anio">Anual</option>
-        </select>
-        
-        <button class="btn btn-primary" onclick="actualizarGrafico()">Generar Histograma</button>
+    <h3>Resumen General (Ventas vs Compras)</h3>
+    <h4 id="titulo-periodo" style="color: var(--primary); margin: 5px 0;">Mostrando: Mes actual</h4>
+    
+    <div style="margin-bottom: 15px; display: flex; gap: 5px;">
+        <button class="btn-filter" onclick="renderizarGraficoGeneral('dia')">Hoy</button>
+        <button class="btn-filter" onclick="renderizarGraficoGeneral('semana')">Semana</button>
+        <button class="btn-filter" onclick="renderizarGraficoGeneral('mes')">Mes</button>
+        <button class="btn-filter" onclick="renderizarGraficoGeneral('anio')">Año</button>
     </div>
-    <div style="height: 300px;"><canvas id="ventasChart"></canvas></div>
+
+    <div style="height: 300px;"><canvas id="generalChart"></canvas></div>
 </div>
 </section>
-<div id="add-modal" class="modal">
-    <div class="modal-content">
-        <span class="close-modal" id="close-add-modal">&times;</span>
-        <h2>Nuevo Producto</h2>
-        <form id="product-form">
-            <div class="form-group"><input type="text" id="prod-name" placeholder="Nombre" required></div>
-            <div class="form-group"><input type="text" id="prod-code" placeholder="Código" required></div>
-            <div class="form-group"><input type="text" id="prod-category" placeholder="Categoría" required></div>
-            <div class="form-row">
-                <input type="number" id="prod-price" placeholder="Precio" step="0.01" required>
-                <input type="number" id="prod-stock" placeholder="Stock" required>
-            </div>
-            <button type="submit" class="btn btn-primary" style="width:100%; margin-top:1rem;">Guardar Producto</button>
-        </form>
-    </div>
-</div>
 </main>
     </div>
 
@@ -137,18 +150,24 @@
         document.getElementById('main-content').style.display = 'none';
         document.getElementById('reportes-section').style.display = 'none';
         document.getElementById('config-section').style.display = 'none';
-        document.getElementById('stats-section').style.display = 'none'; // ¡IMPORTANTE!
+        document.getElementById('stats-section').style.display = 'none';
 
         // 2. Mostramos SOLO la que queremos
         const target = document.getElementById(sectionId);
         if (target) {
             target.style.display = 'block';
+            
+            // SI ES ESTADÍSTICAS, ESPERAMOS A QUE SE HAYA MOSTRADO
+            if (sectionId === 'stats-section') {
+                setTimeout(() => {
+                    if (typeof actualizarGrafico === 'function') actualizarGrafico();
+                    if (typeof renderizarGraficoGeneral === 'function') renderizarGraficoGeneral();
+                }, 50); // Tiempo mínimo para que el navegador procese el display: block
+            }
         }
 
-        // 3. Clase activa en el menú
+        // 3. Clase activa
         document.querySelectorAll('.menu a').forEach(a => a.classList.remove('active'));
-        // Si el evento existe, añadimos la clase activa
-        if (event) event.currentTarget.classList.add('active');
     }
 </script>
 
