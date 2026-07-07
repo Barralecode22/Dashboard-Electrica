@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda Online Eléctrica</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <img src="./assets/logo.png" alt="ElectroStore Logo">
+        </div>
+        <nav>
+            <a href="#" id="nav-tienda" class="active">Productos</a>
+            <a href="#" id="nav-subir">Panel de Control</a>
+        </nav>
+    </header>
+
+    <div id="sub-navbar" class="sub-navbar">
+        <div class="categories-container">
+            <button class="cat-btn active" data-category="todos">Todos los productos</button>
+            <button class="cat-btn" data-category="Iluminación">Iluminación</button>
+            <button class="cat-btn" data-category="Paneles">Paneles Solares</button>
+            <button class="cat-btn" data-category="Herramientas">Herramientas</button>
+            <button class="cat-btn" data-category="Cables">Cables y Conectores</button>
+        </div>
+    </div>
+
+    <main>
+        <section id="section-tienda">
+            
+            <div class="hero-container">
+                <div class="hero-text-side">
+                    <h1>Presentamos el Producto Estrella</h1>
+                    <p>Diseño de vanguardia, funcionalidad intuitiva y la calidad que buscas.</p>
+                    <a href="#" class="btn-hero-buy">Comprar Ahora</a>
+                </div>
+                <div class="hero-image-side">
+                    <img src="https://via.placeholder.com/400" alt="Producto Principal">
+                </div>
+            </div>
+
+            <div id="shop-toolbar" class="shop-toolbar">
+                <div class="search-wrapper">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="search-input" placeholder="Buscar por nombre...">
+                </div>
+                
+                <div class="price-filter-wrapper">
+                    <select id="price-range-select">
+                        <option value="todos">Cualquier precio</option>
+                        <option value="0-50">Menos de $50 USD</option>
+                        <option value="50-100">$50 a $100 USD</option>
+                        <option value="100-500">$100 a $500 USD</option>
+                        <option value="500-up">Más de $500 USD</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="section-title-container">
+                <h2 id="section-title-text">Nuestros Productos Destacados</h2>
+            </div>
+
+            <div class="products-grid" id="products-container">
+                <div class="loading">Cargando productos...</div>
+            </div>
+        </section>
+
+        <section id="section-subir" class="hidden">
+            
+            <div id="admin-login-box" class="form-container">
+                <h2>Acceso de Administrador</h2>
+                <p class="form-subtitle">Ingresa tus credenciales para gestionar el catálogo.</p>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="login-username">Usuario</label>
+                        <input type="text" id="login-username" placeholder="Ej. admin" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Contraseña</label>
+                        <input type="password" id="login-password" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" id="btn-login">Ingresar</button>
+                </form>
+                <div id="login-mensaje"></div>
+            </div>
+
+            <div id="admin-protected-content" class="hidden">
+                <div class="form-container">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+                        <h2>Añadir Nuevo Producto</h2>
+                        <button id="btn-logout" class="btn-logout">Cerrar Sesión</button>
+                    </div>
+                    <p class="form-subtitle">Completa los campos para publicar un artículo en la tienda.</p>
+                    
+                    <form id="upload-form">
+                        <div class="form-group">
+                            <label for="prod-nombre">Nombre del producto</label>
+                            <input type="text" id="prod-nombre" placeholder="Ej. Panel Solar Portátil 100W" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="prod-precio">Precio (USD)</label>
+                            <input type="number" id="prod-precio" step="0.01" placeholder="Ej. 149.99" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="prod-categoria">Categoría</label>
+                            <select id="prod-categoria" required style="width: 100%; padding: 0.8rem 1rem; border: 1px solid #e2e8f0; border-radius: 8px; background-color: #fafafa; font-size: 0.95rem;">
+                                <option value="Iluminación">Iluminación</option>
+                                <option value="Paneles">Paneles Solares</option>
+                                <option value="Herramientas">Herramientas</option>
+                                <option value="Cables">Cables y Conectores</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="prod-imagen">URL de la imagen</label>
+                            <input type="url" id="prod-imagen" placeholder="Ej. https://enlace-de-tu-imagen.com/foto.jpg" required>
+                        </div>
+
+                        <button type="submit" id="btn-guardar">Publicar Producto</button>
+                    </form>
+                    <div id="form-mensaje"></div>
+                </div>
+
+                <div class="admin-list-container">
+                    <h3 class="admin-list-title">Productos Publicados Actuales</h3>
+                    <div id="admin-products-list" class="admin-products-list">
+                        <div class="loading">Cargando inventario...</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="product-modal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <button id="modal-close-btn" class="modal-close-btn">&times;</button>
+            <div class="modal-content-layout">
+                <div class="modal-image-side">
+                    <img id="modal-img" src="" alt="">
+                </div>
+                <div class="modal-info-side">
+                    <span id="modal-tag" class="modal-badge">Categoría</span>
+                    <h2 id="modal-title">Nombre del Producto</h2>
+                    <p id="modal-price" class="modal-price">$0.00</p>
+                    
+                    <div class="modal-extra-details">
+                        <div class="detail-item">
+                            <span class="detail-icon">📦</span>
+                            <div>
+                                <strong>Disponibilidad inmediata</strong>
+                                <p>Stock disponible en sucursal central.</p>
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">🛡️</span>
+                            <div>
+                                <strong>Garantía de Fábrica</strong>
+                                <p>Garantía oficial certificada de 12 meses.</p>
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">⚡</span>
+                            <div>
+                                <strong>Envío Express</strong>
+                                <p>Despacho prioritario seguro en 24/48 horas.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="#" id="modal-whatsapp-btn" class="modal-btn-action" target="_blank">Consultar Disponibilidad</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-column brand-col">
+                <p>Tu socio de confianza en soluciones eléctricas, paneles solares e iluminación de vanguardia para proyectos residenciales e industriales.</p>
+            </div>
+
+            <div class="footer-column">
+                <h4>Navegación</h4>
+                <ul>
+                    <li><a href="#" onclick="document.getElementById('nav-tienda').click(); return false;">Productos</a></li>
+                    <li><a href="#" onclick="document.getElementById('nav-subir').click(); return false;">Panel de Control</a></li>
+                    <li><a href="#">Términos y Condiciones</a></li>
+                    <li><a href="#">Políticas de Privacidad</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-column contact-col">
+                <h4>Soporte Técnico</h4>
+                <p>¿Tienes dudas con un producto o necesitas un presupuesto a medida?</p>
+                <a href="#" class="btn-whatsapp">
+                    <span class="ws-icon">💬</span> Hablar por WhatsApp
+                </a>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 ElectroStore. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
