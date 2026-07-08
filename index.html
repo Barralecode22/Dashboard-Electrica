@@ -13,8 +13,11 @@
             <img src="./assets/logo.png" alt="ElectroStore Logo">
         </div>
         <nav>
-            <a href="#" id="nav-tienda" class="active">Productos</a>
-            <a href="#" id="nav-subir">Panel de Control</a>
+            <!-- SE RENOMBRARON LAS ETIQUETAS VISIBLES MANTENIENDO LOS IDs INTACTOS -->
+            <a href="#" id="nav-tienda" class="active">Inicio</a>
+            <a href="#" id="nav-proyectos">Productos</a>
+            <a href="#" id="nav-favoritos">❤️ Favoritos</a>
+            <a href="#" id="nav-subir">Cuenta</a>
         </nav>
     </header>
 
@@ -25,6 +28,7 @@
             <button class="cat-btn" data-category="Paneles">Paneles Solares</button>
             <button class="cat-btn" data-category="Herramientas">Herramientas</button>
             <button class="cat-btn" data-category="Cables">Cables y Conectores</button>
+            <button class="cat-btn cat-oferta-btn" data-category="ofertas" style="color: #ef4444; font-weight: 700;">🔥 Ofertas</button>
         </div>
     </div>
 
@@ -32,14 +36,8 @@
         <section id="section-tienda">
             
             <div class="hero-container">
-                <div class="hero-text-side">
-                    <h1>Presentamos el Producto Estrella</h1>
-                    <p>Diseño de vanguardia, funcionalidad intuitiva y la calidad que buscas.</p>
-                    <a href="#" class="btn-hero-buy">Comprar Ahora</a>
-                </div>
-                <div class="hero-image-side">
-                    <img src="https://via.placeholder.com/400" alt="Producto Principal">
-                </div>
+                <div class="hero-image-fullwidth">
+                <img src="./assets/banner.png" alt="Producto Estrella">
             </div>
 
             <div id="shop-toolbar" class="shop-toolbar">
@@ -51,11 +49,21 @@
                 <div class="price-filter-wrapper">
                     <select id="price-range-select">
                         <option value="todos">Cualquier precio</option>
-                        <option value="0-50">Menos de $50 USD</option>
-                        <option value="50-100">$50 a $100 USD</option>
-                        <option value="100-500">$100 a $500 USD</option>
-                        <option value="500-up">Más de $500 USD</option>
+                        <option value="0-50">Menos de Q50</option>
+                        <option value="50-100">Q50 a Q100</option>
+                        <option value="100-500">Q100 a Q500</option>
+                        <option value="500-up">Más de Q500</option>
                     </select>
+                </div>
+            </div>
+
+            <!-- SECCIÓN DE PRODUCTOS EN OFERTA -->
+            <div id="ofertas-container-wrapper">
+                <div class="section-title-container">
+                    <h2 style="color: #ef4444;">🔥 Grandes Ofertas del Momento</h2>
+                </div>
+                <div class="products-grid" id="ofertas-container">
+                    <!-- Aquí se cargarán dinámicamente solo las ofertas -->
                 </div>
             </div>
 
@@ -66,27 +74,68 @@
             <div class="products-grid" id="products-container">
                 <div class="loading">Cargando productos...</div>
             </div>
+            <div id="favoritos-tienda-wrapper" class="hidden">
+                <div class="section-title-container" style="margin-top: 4rem;">
+                    <h2>♥️ Tus Favoritos Guardados</h2>
+                </div>
+                <div class="products-grid" id="favoritos-tienda-container">
+                    </div>
+            </div>
         </section>
 
         <section id="section-subir" class="hidden">
             
-            <div id="admin-login-box" class="form-container">
-                <h2>Acceso de Administrador</h2>
-                <p class="form-subtitle">Ingresa tus credenciales para gestionar el catálogo.</p>
-                <form id="login-form">
-                    <div class="form-group">
-                        <label for="login-username">Usuario</label>
-                        <input type="text" id="login-username" placeholder="Ej. admin" required>
+            <!-- CONTENEDOR DE DOBLE TARJETA (LOGIN ADM + CLIENTE) -->
+            <div id="auth-dual-wrapper" class="auth-container-flex">
+                
+                <!-- TARJETA ADMINISTRADOR (INTACTA) -->
+                <div id="admin-login-box" class="form-container">
+                    <h2>Acceso de Administrador</h2>
+                    <p class="form-subtitle">Ingresa tus credenciales para gestionar el catálogo.</p>
+                    <form id="login-form">
+                        <div class="form-group">
+                            <label for="login-username">Usuario</label>
+                            <input type="text" id="login-username" placeholder="Ej. admin" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="login-password">Contraseña</label>
+                            <input type="password" id="login-password" placeholder="••••••••" required>
+                        </div>
+                        <button type="submit" id="btn-login">Ingresar</button>
+                    </form>
+                    <div id="login-mensaje"></div>
+                </div>
+
+                <!-- NUEVA TARJETA CLIENTE -->
+                <div id="client-login-box" class="form-container">
+                    <h2 id="client-auth-title">Acceso Clientes</h2>
+                    <p id="client-auth-subtitle" class="form-subtitle">Inicia sesión para realizar tus compras y revisar tus pedidos.</p>
+                    
+                    <form id="client-login-form">
+                        <div class="form-group" id="group-client-nombre" style="display: none;">
+                            <label for="client-nombre">Nombre Completo</label>
+                            <input type="text" id="client-nombre" placeholder="Ej. Juan Pérez">
+                        </div>
+                        <div class="form-group">
+                            <label for="client-email">Correo Electrónico</label>
+                            <input type="email" id="client-email" placeholder="correo@ejemplo.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="client-password">Contraseña</label>
+                            <input type="password" id="client-password" placeholder="••••••••" required>
+                        </div>
+                        <button type="submit" id="btn-client-submit">Iniciar Sesión</button>
+                    </form>
+                    
+                    <div style="text-align: center; margin-top: 1.25rem;">
+                        <a href="#" id="toggle-client-view" style="color: #4169e1; font-size: 0.9rem; font-weight: 600; text-decoration: none;">¿No tienes cuenta? Regístrate aquí</a>
                     </div>
-                    <div class="form-group">
-                        <label for="login-password">Contraseña</label>
-                        <input type="password" id="login-password" placeholder="••••••••" required>
-                    </div>
-                    <button type="submit" id="btn-login">Ingresar</button>
-                </form>
-                <div id="login-mensaje"></div>
+                    <div id="client-mensaje"></div>
+                </div>
+
             </div>
 
+            <!-- PANEL EXCLUSIVO ADMINISTRADOR PROTEGIDO -->
             <div id="admin-protected-content" class="hidden">
                 <div class="form-container">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
@@ -102,7 +151,7 @@
                         </div>
                         
                         <div class="form-group">
-                            <label for="prod-precio">Precio (USD)</label>
+                            <label for="prod-precio">Precio Base (USD)</label>
                             <input type="number" id="prod-precio" step="0.01" placeholder="Ej. 149.99" required>
                         </div>
                         
@@ -114,6 +163,16 @@
                                 <option value="Herramientas">Herramientas</option>
                                 <option value="Cables">Cables y Conectores</option>
                             </select>
+                        </div>
+
+                        <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem;">
+                            <input type="checkbox" id="prod-oferta" style="width: auto; cursor: pointer;">
+                            <label for="prod-oferta" style="margin-bottom: 0; cursor: pointer;">¿Este producto inicia en Oferta?</label>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="prod-descripcion">Descripción del producto</label>
+                            <textarea id="prod-descripcion" placeholder="Detalles técnicos, materiales, etc." rows="4" style="width: 100%; padding: 0.8rem; border: 1px solid #e2e8f0; border-radius: 8px;"></textarea>
                         </div>
                         
                         <div class="form-group">
@@ -133,6 +192,20 @@
                     </div>
                 </div>
             </div>
+
+            <!-- NUEVA VISTA PROTEGIDA SUCEDÁNEA PARA EL CLIENTE -->
+            <div id="client-protected-content" class="hidden" style="max-width: 600px; margin: 0 auto; padding: 2rem;">
+                <div class="form-container" style="text-align: center;">
+                    <h2 id="txt-welcome-client" style="margin-bottom: 0.5rem;">👋 ¡Bienvenido a tu Espacio de Cliente!</h2>
+                    <p class="form-subtitle">Próximamente aquí podrás ver el historial de tus cotizaciones y compras desde tu cuenta.</p>
+                    <button id="btn-client-logout" class="btn-logout" style="float: none; margin-top: 1.5rem;">Cerrar Sesión</button>
+                </div>
+            </div>
+
+        </section>
+        <section id="section-proyectos" class="hidden" style="padding: 4rem; text-align: center;">
+            <h2>Nuestros Proyectos</h2>
+            <p>Aquí mostraremos nuestros casos de éxito en instalaciones eléctricas.</p>
         </section>
     </main>
 
@@ -146,7 +219,10 @@
                 <div class="modal-info-side">
                     <span id="modal-tag" class="modal-badge">Categoría</span>
                     <h2 id="modal-title">Nombre del Producto</h2>
-                    <p id="modal-price" class="modal-price">$0.00</p>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <p id="modal-price" class="modal-price">$0.00</p>
+                        <p id="modal-old-price" style="text-decoration: line-through; color: #64748b; font-size: 1.1rem; display: none;">$0.00</p>
+                    </div>
                     
                     <div class="modal-extra-details">
                         <div class="detail-item">
@@ -181,14 +257,15 @@
     <footer>
         <div class="footer-container">
             <div class="footer-column brand-col">
+                <h3>ElectroStore</h3>
                 <p>Tu socio de confianza en soluciones eléctricas, paneles solares e iluminación de vanguardia para proyectos residenciales e industriales.</p>
             </div>
 
             <div class="footer-column">
                 <h4>Navegación</h4>
                 <ul>
-                    <li><a href="#" onclick="document.getElementById('nav-tienda').click(); return false;">Productos</a></li>
-                    <li><a href="#" onclick="document.getElementById('nav-subir').click(); return false;">Panel de Control</a></li>
+                    <li><a href="#" onclick="document.getElementById('nav-tienda').click(); return false;">Inicio</a></li>
+                    <li><a href="#" onclick="document.getElementById('nav-subir').click(); return false;">Cuenta</a></li>
                     <li><a href="#">Términos y Condiciones</a></li>
                     <li><a href="#">Políticas de Privacidad</a></li>
                 </ul>
@@ -207,10 +284,6 @@
             <p>&copy; 2026 ElectroStore. Todos los derechos reservados.</p>
         </div>
     </footer>
-
-    <script type="module" src="script.js"></script>
-</body>
-</html>
 
     <script type="module" src="script.js"></script>
 </body>
