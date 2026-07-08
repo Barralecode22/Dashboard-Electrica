@@ -123,7 +123,7 @@ async function toggleFavorito(id, event) {
     // Validamos que haya un cliente logueado
     const user = auth.currentUser;
     if (!user) {
-        alert("¡Debes iniciar sesión o crear una cuenta para guardar tus favoritos! ❤️");
+        alert("¡Debes iniciar sesión o crear una cuenta para guardar tus favoritos! ♥️");
         // Redirigimos automáticamente al menú "Cuenta"
         navSubir.click();
         return;
@@ -287,7 +287,7 @@ navFavoritos.addEventListener('click', (e) => {
     shopToolbar.classList.remove('hidden');
     
     currentCategory = "favoritos";
-    sectionTitleText.innerText = "❤️ Favoritos Guardados";
+    sectionTitleText.innerText = "♥️ Favoritos Guardados";
     
     const catButtons = document.querySelectorAll('.cat-btn');
     catButtons.forEach(btn => btn.classList.remove('active'));
@@ -331,7 +331,7 @@ catButtons.forEach(button => {
         } else if(currentCategory === "ofertas") {
             sectionTitleText.innerText = "🔥 ¡Productos en Oferta Imperdible!";
         } else if(currentCategory === "favoritos") {
-            sectionTitleText.innerText = "❤️ Favoritos Guardados";
+            sectionTitleText.innerText = "♥️ Favoritos Guardados";
         } else {
             sectionTitleText.innerText = `Categoría: ${currentCategory}`;
         }
@@ -366,10 +366,10 @@ function openProductModal(product) {
     modalImg.alt = product.nombre;
     modalTag.innerText = product.oferta ? `OFERTA ${product.porcentaje || 0}% 🔥` : (product.categoria || 'General');
     modalTitle.innerText = product.nombre;
-    modalPrice.innerText = `$${product.precio} USD`;
+    modalPrice.innerText = `Q ${product.precio}`;
 
     if (product.oferta && product.precioOriginal) {
-        modalOldPrice.innerText = `$${product.precioOriginal} USD`;
+        modalOldPrice.innerText = `Q ${product.precioOriginal}`;
         modalOldPrice.style.display = 'block';
     } else {
         modalOldPrice.style.display = 'none';
@@ -394,14 +394,14 @@ function createProductCard(product, productId) {
         <div class="product-image-wrapper" style="position: relative;">
             ${product.oferta ? `<span class="badge-oferta-card">-${product.porcentaje || 0}%</span>` : ''}
             <button class="btn-favorito-heart ${favActivo ? 'is-fav' : ''}" data-id="${productId}">
-                ${favActivo ? '❤️' : '🤍'}
+                ${favActivo ? '♥️' : '🤍'}
             </button>
             <img src="${product.imagen || 'https://via.placeholder.com/300'}" alt="${product.nombre}">
         </div>
         <div class="product-info">
             <h3 class="product-title">${product.nombre}</h3>
             <div style="display: flex; gap: 8px; align-items: center;">
-                <p class="product-price">$${product.precio}</p>
+                <p class="product-price">Q${product.precio}</p>
                 ${product.oferta && product.precioOriginal ? `<p style="text-decoration: line-through; color: #64748b; font-size: 0.85rem; margin-bottom: 0.5rem;">$${product.precioOriginal}</p>` : ''}
             </div>
         </div>
@@ -536,7 +536,7 @@ async function loadAdminProductsList() {
                         <span class="row-title">${product.nombre} ${product.oferta ? `<strong style="color: #ef4444;">(-${product.porcentaje || 0}%)</strong>` : ''}</span>
                         <span class="row-category">${product.categoria || 'Sin categoría'}</span>
                     </div>
-                    <span class="row-price">$${precio} USD</span>
+                    <span class="row-price">Q ${precio}</span>
                 </div>
                 
                 <div class="row-actions-oferta" style="display: flex; align-items: center; gap: 0.5rem; background: #f8fafc; padding: 0.5rem; border-radius: 6px; border: 1px solid #e2e8f0;">
