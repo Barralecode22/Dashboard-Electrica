@@ -937,3 +937,20 @@ if (btnEliminarCategoria) {
 if (shopSidebar) shopSidebar.style.display = "none";
 loadProducts();
 loadCategories();
+
+// --- LOGICA PARA EL ENLACE "VER MÁS PRODUCTOS" ---
+if (linkVerMasProductos) {
+    linkVerMasProductos.addEventListener('click', (e) => {
+        e.preventDefault(); // Evita que la página se recargue o salte
+        
+        if (navProyectos) {
+            navProyectos.click(); // Simula el clic en la pestaña "Productos"
+            
+            // Opcional: Hace un scroll suave hacia el inicio del catálogo
+            window.scrollTo({
+                top: sectionTienda.offsetTop - 100, 
+                behavior: 'smooth'
+            });
+        }
+    });
+}
