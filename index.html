@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tienda Online Eléctrica</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="./assets/icono.ico">
 </head>
 <body>
 
@@ -13,11 +14,18 @@
             <img src="./assets/logo.png" alt="ElectroStore Logo">
         </div>
         <nav>
-            <!-- SE RENOMBRARON LAS ETIQUETAS VISIBLES MANTENIENDO LOS IDs INTACTOS -->
             <a href="#" id="nav-tienda" class="active">Inicio</a>
             <a href="#" id="nav-proyectos">Productos</a>
-            <a href="#" id="nav-favoritos">❤️ Favoritos</a>
-            <a href="#" id="nav-subir">Cuenta</a>
+            <a href="#sobre-nosotros">Sobre Nosotros</a>
+            <a href="#" id="nav-favoritos" class="nav-with-icon" title="Favoritos">
+                <svg class="icon-minimal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+            </a>
+            <a href="#" id="nav-subir" class="nav-with-icon" title="Mi Cuenta">
+                <svg class="icon-minimal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </a>
+            <a href="#" id="nav-contacto" class="nav-with-icon" title="Contacto">
+                <svg class="icon-minimal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            </a>
         </nav>
     </header>
 
@@ -28,67 +36,192 @@
             <button class="cat-btn" data-category="Paneles">Paneles Solares</button>
             <button class="cat-btn" data-category="Herramientas">Herramientas</button>
             <button class="cat-btn" data-category="Cables">Cables y Conectores</button>
-            <button class="cat-btn cat-oferta-btn" data-category="ofertas" style="color: #ef4444; font-weight: 700;">🔥 Ofertas</button>
+            <button class="cat-btn cat-oferta-btn" data-category="ofertas" style="color: #ef4444; font-weight: 700; display: inline-flex; align-items: center; gap: 0.4rem;">
+                <svg class="icon-minimal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2H2v10l9.29 9.29c.39.39 1.02.39 1.41 0l7.59-7.59c.39-.39.39-1.02 0-1.41L12 2z"/>
+                    <path d="M7 7h.01"/>
+                </svg>
+                Ofertas
+            </button>
         </div>
     </div>
 
     <main>
         <section id="section-tienda">
             
-            <div class="hero-container">
+            <!-- Banner principal (SÓLO SE MUESTRA EN EL INICIO) -->
+            <div id="hero-banner" class="hero-container">
                 <div class="hero-image-fullwidth">
-                <img src="./assets/banner.png" alt="Producto Estrella">
+                    <img src="./assets/banner.png" alt="Producto Estrella">
+                </div>
             </div>
 
+            <!-- Botón flotante o barra móvil para abrir los filtros del Sidebar en celular -->
             <div id="shop-toolbar" class="shop-toolbar">
-                <div class="search-wrapper">
-                    <span class="search-icon">🔍</span>
-                    <input type="text" id="search-input" placeholder="Buscar por nombre...">
-                </div>
-                
-                <div class="price-filter-wrapper">
-                    <select id="price-range-select">
-                        <option value="todos">Cualquier precio</option>
-                        <option value="0-50">Menos de Q50</option>
-                        <option value="50-100">Q50 a Q100</option>
-                        <option value="100-500">Q100 a Q500</option>
-                        <option value="500-up">Más de Q500</option>
-                    </select>
+                <div id="shop-toolbar-mobile" class="shop-toolbar-mobile" style="width: 100%;">
+                    <button id="btn-open-sidebar" class="btn-open-sidebar" style="width: 100%; padding: 0.8rem; background-color: #4169e1; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                        🔍 Filtrar y Buscar Productos
+                    </button>
                 </div>
             </div>
 
-            <!-- SECCIÓN DE PRODUCTOS EN OFERTA -->
-            <div id="ofertas-container-wrapper">
+            <!-- SECCIÓN DE PRODUCTOS EN OFERTA (SÓLO EN EL INICIO) -->
+            <div id="ofertas-container-wrapper" class="ofertas-premium-section">
                 <div class="section-title-container">
-                    <h2 style="color: #ef4444;">🔥 Grandes Ofertas del Momento</h2>
+                    <div class="glow-title-box">
+                        <h2 class="ofertas-section-title">
+                            <svg class="icon-minimal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2H2v10l9.29 9.29c.39.39 1.02.39 1.41 0l7.59-7.59c.39-.39.39-1.02 0-1.41L12 2z"/>
+                                <path d="M7 7h.01"/>
+                            </svg>
+                            Las mejores ofertas están en JCS Electrica
+                        </h2>
+                    </div>
                 </div>
-                <div class="products-grid" id="ofertas-container">
-                    <!-- Aquí se cargarán dinámicamente solo las ofertas -->
+                <div class="products-grid-ofertas" id="ofertas-container">
+                    <!-- Cargado de Tarjetas de Oferta Premium dinámicamente -->
                 </div>
             </div>
 
-            <div class="section-title-container">
+            <div class="section-title-container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; padding-top: 2rem;">
                 <h2 id="section-title-text">Nuestros Productos Destacados</h2>
+                <a href="#" id="link-ver-mas-productos" style="color: #4169e1; font-weight: 600; text-decoration: none; font-size: 0.95rem; transition: color 0.2s ease; display: inline-flex; align-items: center; gap: 0.25rem;">
+                    Ver más productos 
+                    <svg class="icon-minimal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </a>
             </div>
 
-            <div class="products-grid" id="products-container">
-                <div class="loading">Cargando productos...</div>
+            <!-- CONTENEDOR DE LA PÁGINA DE PRODUCTOS (CON SIDEBAR A LA IZQUIERDA Y GRID A LA DERECHA) -->
+            <div class="shop-layout-container">
+                
+                <!-- LADO IZQUIERDO: Barra Lateral de Filtros (Sidebar) -->
+                <aside id="shop-sidebar" class="shop-sidebar hidden-sidebar">
+                    <div class="sidebar-header">
+                        <h3>Filtrar Búsqueda</h3>
+                        <!-- Botón para cerrar en móviles -->
+                        <button id="btn-close-sidebar" class="btn-close-sidebar">&times;</button>
+                    </div>
+
+                    <div class="sidebar-content">
+                        <!-- 1. Buscador de Texto -->
+                        <div class="filter-group">
+                            <label for="search-input">Buscar producto</label>
+                            <div class="search-box-wrapper">
+                                <input type="text" id="search-input" placeholder="Buscar por nombre...">
+                            </div>
+                        </div>
+
+                        <!-- 2. Categorías -->
+                        <div class="filter-group">
+                            <label>Categorías</label>
+                            <div class="sidebar-categories-list">
+                                <button class="cat-btn-sidebar active" data-category="todos">Todos los Productos</button>
+                                <button class="cat-btn-sidebar" data-category="favoritos">❤️ Mis Favoritos</button>
+                                <button class="cat-btn-sidebar" data-category="ofertas">🔥 Ofertas Especiales</button>
+                                <button class="cat-btn-sidebar" data-category="Iluminación">Iluminación</button>
+                                <button class="cat-btn-sidebar" data-category="Paneles">Paneles Solares</button>
+                                <button class="cat-btn-sidebar" data-category="Herramientas">Herramientas</button>
+                                <button class="cat-btn-sidebar" data-category="Cables">Cables y Conectores</button>
+                            </div>
+                        </div>
+
+                        <!-- 3. Rango de Precios -->
+                        <div class="filter-group">
+                            <label for="price-range-select">Rango de precio</label>
+                            <select id="price-range-select">
+                                <option value="todos">Cualquier precio</option>
+                                <option value="0-50">Menos de Q50</option>
+                                <option value="50-100">Q50 a Q100</option>
+                                <option value="100-500">Q100 a Q500</option>
+                                <option value="500-up">Más de Q500</option>
+                            </select>
+                        </div>
+
+                        <!-- 4. Ordenamiento -->
+                        <div class="filter-group">
+                            <label for="sidebar-sort">Ordenar por</label>
+                            <select id="sidebar-sort">
+                                <option value="defecto">Recomendados</option>
+                                <option value="precio-asc">Precio: Menor a Mayor</option>
+                                <option value="precio-desc">Precio: Mayor a Menor</option>
+                                <option value="nombre-asc">Nombre: A-Z</option>
+                            </select>
+                        </div>
+
+                        <!-- 5. Filtro de Ofertas (Switch) -->
+                        <div class="filter-group checkbox-group">
+                            <input type="checkbox" id="sidebar-only-offers">
+                            <label for="sidebar-only-offers">Solo productos en oferta</label>
+                        </div>
+
+                        <!-- Botón Limpiar Filtros -->
+                        <button id="btn-clear-filters" class="btn-reset-filters">
+                            Limpiar todos los filtros
+                        </button>
+
+                        <!-- Banner de Soporte / WhatsApp -->
+                        <div class="sidebar-support-banner">
+                            <p>¿Necesitas asesoría técnica?</p>
+                            <a href="https://wa.me/5493510000000" target="_blank" class="btn-sidebar-whatsapp">
+                                Chat de Soporte
+                            </a>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- LADO DERECHO: Cuadrícula principal de productos -->
+                <div class="products-grid-wrapper" style="flex: 1;">
+                    <div class="products-grid" id="products-container">
+                        <div class="loading">Cargando productos...</div>
+                    </div>
+                </div>
+
             </div>
+
             <div id="favoritos-tienda-wrapper" class="hidden">
                 <div class="section-title-container" style="margin-top: 4rem;">
                     <h2>♥️ Tus Favoritos Guardados</h2>
                 </div>
-                <div class="products-grid" id="favoritos-tienda-container">
+                <div class="products-grid" id="favoritos-tienda-container"></div>
+            </div>
+        </section>
+
+        <!-- ─── SECCIÓN: SOBRE NOSOTROS (JCS ELÉCTRICA) ─── -->
+        <section id="sobre-nosotros" class="sobre-nosotros-section">
+            <div class="container-sobre-nosotros">
+                
+                <!-- Bloque Historia -->
+                <article class="historia-bloque">
+                    <h2>Historia de JCS Eléctrica</h2>
+                    <p class="destacado">Fundada el 30 de julio de 2026 con el sueño de crear una empresa dedicada a la venta de materiales eléctricos de calidad y a brindar un servicio honesto y cercano a cada cliente.</p>
+                    <p>Este proyecto nació con esfuerzo, dedicación y el deseo de ofrecer productos confiables, buenos precios y una atención personalizada. Desde el primer día, nuestro compromiso ha sido ayudar a nuestros clientes a encontrar la mejor solución para sus instalaciones eléctricas, construyendo relaciones basadas en la confianza, la responsabilidad y el buen servicio.</p>
+                    <p>En JCS Eléctrica creemos que cada venta es una oportunidad para demostrar nuestro compromiso con la calidad, porque nuestra meta es crecer junto a nuestros clientes y convertirnos en una empresa reconocida en Guatemala.</p>
+                    <p class="eslogan">JCS Eléctrica – Calidad que conecta.</p>
+                </article>
+
+                <!-- Bloque Misión y Visión en columnas -->
+                <div class="mision-vision-grid">
+                    <div class="tarjeta-mv">
+                        <h3>Misión</h3>
+                        <p>Brindar materiales eléctricos de calidad con un servicio confiable, atención personalizada y precios competitivos, ofreciendo siempre soluciones que satisfagan las necesidades de nuestros clientes.</p>
                     </div>
+                    
+                    <div class="tarjeta-mv">
+                        <h3>Visión</h3>
+                        <p>Ser una empresa de confianza en la venta de materiales eléctricos.</p>
+                    </div>
+                </div>
+
             </div>
         </section>
 
         <section id="section-subir" class="hidden">
             
-            <!-- CONTENEDOR DE DOBLE TARJETA (LOGIN ADM + CLIENTE) -->
             <div id="auth-dual-wrapper" class="auth-container-flex">
                 
-                <!-- TARJETA ADMINISTRADOR (INTACTA) -->
+                <!-- ACCESO ADMINISTRADOR -->
                 <div id="admin-login-box" class="form-container">
                     <h2>Acceso de Administrador</h2>
                     <p class="form-subtitle">Ingresa tus credenciales para gestionar el catálogo.</p>
@@ -106,7 +239,7 @@
                     <div id="login-mensaje"></div>
                 </div>
 
-                <!-- NUEVA TARJETA CLIENTE -->
+                <!-- ACCESO CLIENTES -->
                 <div id="client-login-box" class="form-container">
                     <h2 id="client-auth-title">Acceso Clientes</h2>
                     <p id="client-auth-subtitle" class="form-subtitle">Inicia sesión para realizar tus compras y revisar tus pedidos.</p>
@@ -151,28 +284,30 @@
                         </div>
                         
                         <div class="form-group">
-                            <label for="prod-precio">Precio Base (USD)</label>
+                            <label for="prod-precio">Precio Base (Q)</label>
                             <input type="number" id="prod-precio" step="0.01" placeholder="Ej. 149.99" required>
                         </div>
                         
                         <div class="form-group">
                             <label for="prod-categoria">Categoría</label>
                             <select id="prod-categoria" required style="width: 100%; padding: 0.8rem 1rem; border: 1px solid #e2e8f0; border-radius: 8px; background-color: #fafafa; font-size: 0.95rem;">
-                                <option value="Iluminación">Iluminación</option>
-                                <option value="Paneles">Paneles Solares</option>
-                                <option value="Herramientas">Herramientas</option>
-                                <option value="Cables">Cables y Conectores</option>
+                                <!-- Se cargarán dinámicamente desde la base de datos -->
                             </select>
                         </div>
 
-                        <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem;">
+                        <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
                             <input type="checkbox" id="prod-oferta" style="width: auto; cursor: pointer;">
                             <label for="prod-oferta" style="margin-bottom: 0; cursor: pointer;">¿Este producto inicia en Oferta?</label>
                         </div>
 
+                        <div class="form-group hidden" id="group-prod-porcentaje">
+                            <label for="prod-porcentaje">Porcentaje de Descuento (%)</label>
+                            <input type="number" id="prod-porcentaje" min="1" max="99" placeholder="Ej. 15">
+                        </div>
+
                         <div class="form-group">
                             <label for="prod-descripcion">Descripción del producto</label>
-                            <textarea id="prod-descripcion" placeholder="Detalles técnicos, materiales, etc." rows="4" style="width: 100%; padding: 0.8rem; border: 1px solid #e2e8f0; border-radius: 8px;"></textarea>
+                            <textarea id="prod-descripcion" placeholder="Detalles del producto..." style="width: 100%; padding: 0.8rem 1rem; border: 1px solid #e2e8f0; border-radius: 8px; background-color: #fafafa; font-size: 0.95rem; min-height: 80px; font-family: inherit;"></textarea>
                         </div>
                         
                         <div class="form-group">
@@ -182,6 +317,37 @@
 
                         <button type="submit" id="btn-guardar">Publicar Producto</button>
                     </form>
+                    <!-- Panel de Gestión de Categorías (Nuevo) -->
+                    <!-- PANEL DE GESTIÓN DE CATEGORÍAS -->
+                        <div class="form-container" style="margin-top: 2rem; margin-bottom: 2rem;">
+                            <h2>Gestionar Categorías</h2>
+                            <p class="form-subtitle">Agrega nuevas categorías para organizar tus materiales eléctricos.</p>
+                            
+                            <form id="category-form" style="display: flex; gap: 1rem; align-items: flex-end;">
+                                <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                                    <label for="new-cat-name">Nombre de la nueva categoría</label>
+                                    <input type="text" id="new-cat-name" placeholder="Ej. Tubos y Ductos" required>
+                                </div>
+                                <button type="submit" id="btn-guardar-categoria" style="padding: 0.8rem 1.5rem; background-color: #10b981; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; height: 45px;">
+                                    + Añadir
+                                </button>
+                            </form>
+                            
+                            <div id="category-mensaje"></div>
+
+                            <!-- Sección Interactiva para Eliminar de Forma Segura -->
+                            <div class="category-management-box" style="margin-top: 2rem; padding-top: 2rem; border-top: 2px dashed #e2e8f0;">
+                                <h3 style="font-size: 1.1rem; color: #1e293b; margin-bottom: 1rem;">🗑️ Eliminar Categorías Existientes</h3>
+                                <div style="display: flex; gap: 1rem; align-items: center;">
+                                    <select id="delete-categoria-select" style="flex: 1; padding: 0.8rem 1rem; border: 1px solid #e2e8f0; border-radius: 8px; background-color: #fafafa;">
+                                        <option value="" disabled selected>Selecciona una categoría...</option>
+                                    </select>
+                                    <button type="button" id="btn-eliminar-categoria" style="padding: 0.8rem 1.5rem; background-color: #ef4444; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; height: 45px;">
+                                        Eliminar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     <div id="form-mensaje"></div>
                 </div>
 
@@ -193,7 +359,7 @@
                 </div>
             </div>
 
-            <!-- NUEVA VISTA PROTEGIDA SUCEDÁNEA PARA EL CLIENTE -->
+            <!-- ESPACIO DE CLIENTE -->
             <div id="client-protected-content" class="hidden" style="max-width: 600px; margin: 0 auto; padding: 2rem;">
                 <div class="form-container" style="text-align: center;">
                     <h2 id="txt-welcome-client" style="margin-bottom: 0.5rem;">👋 ¡Bienvenido a tu Espacio de Cliente!</h2>
@@ -202,10 +368,6 @@
                 </div>
             </div>
 
-        </section>
-        <section id="section-proyectos" class="hidden" style="padding: 4rem; text-align: center;">
-            <h2>Nuestros Proyectos</h2>
-            <p>Aquí mostraremos nuestros casos de éxito en instalaciones eléctricas.</p>
         </section>
     </main>
 
@@ -225,27 +387,7 @@
                     </div>
                     
                     <div class="modal-extra-details">
-                        <div class="detail-item">
-                            <span class="detail-icon">📦</span>
-                            <div>
-                                <strong>Disponibilidad inmediata</strong>
-                                <p>Stock disponible en sucursal central.</p>
-                            </div>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-icon">🛡️</span>
-                            <div>
-                                <strong>Garantía de Fábrica</strong>
-                                <p>Garantía oficial certificada de 12 meses.</p>
-                            </div>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-icon">⚡</span>
-                            <div>
-                                <strong>Envío Express</strong>
-                                <p>Despacho prioritario seguro en 24/48 horas.</p>
-                            </div>
-                        </div>
+                        <p id="modal-descripcion"></p>
                     </div>
 
                     <a href="#" id="modal-whatsapp-btn" class="modal-btn-action" target="_blank">Consultar Disponibilidad</a>
@@ -257,7 +399,7 @@
     <footer>
         <div class="footer-container">
             <div class="footer-column brand-col">
-                <p>Tu socio de confianza en soluciones eléctricas, paneles solares e iluminación de vanguardia para proyectos residenciales e industriales.</p>
+                <p>Tu socio de confianza en soluciones eléctricas, herramientas e iluminación para proyectos residenciales e industriales.</p>
             </div>
 
             <div class="footer-column">
@@ -273,14 +415,14 @@
             <div class="footer-column contact-col">
                 <h4>Soporte Técnico</h4>
                 <p>¿Tienes dudas con un producto o necesitas un presupuesto a medida?</p>
-                <a href="#" class="btn-whatsapp">
-                    <span class="ws-icon">💬</span> Hablar por WhatsApp
+                <a href="https://wa.me/5493510000000" target="_blank" class="btn-whatsapp">
+                    <span class="ws-icon">📞</span> Hablar por WhatsApp
                 </a>
             </div>
         </div>
 
         <div class="footer-bottom">
-            <p>&copy; 2026 ElectroStore. Todos los derechos reservados.</p>
+            <p>&copy; 2026 JCS ELÉCTRICA. Todos los derechos reservados.</p>
         </div>
     </footer>
 
